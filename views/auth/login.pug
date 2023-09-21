@@ -1,0 +1,28 @@
+
+extends ../layout/index
+
+block contenido
+    div.py-10
+        h1.text-4xl.my-10.font-extrabold.text-center Bienes
+            spam.font-normal Raices
+            p.font-thin.text-2xl La puerta de entrada a tu nuevo hogar.
+        h2.text-center.text-2xl.font-extrabold= pagina
+
+    div.mt-1.mx-auto.max-w-md
+        div.bg-white.py-8.px-4.shadow.rounded-md
+            form.space-y-5
+
+                div
+                    label.block.text-sm.uppercase.text-gray-500.mb-1.font-bold E-mail
+                    input#nombre.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Tu Email" type="email" name="e-mail")
+
+                div
+                    label.block.text-sm.uppercase.text-gray-500.mb-1.font-bold Password
+                    input#nombre.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Tu Password" type="password" name="Password")
+                
+                div.flex.items-center.justify-between
+                    a.text-gray-500.text-xs(href="/auth/registro") No tengo cuenta.
+                    a.text-gray-500.text-xs(href="/auth/recovery") Olvidé mi password
+
+
+                input(class="w-full bg-pink-400 hover:bg-pink-500 text-white font-bold py-2 cursor-pointer" type="submit" value="Iniciar Sesión").rounded-md
