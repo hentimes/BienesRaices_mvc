@@ -7,17 +7,25 @@
  -La parte visual estará creada en Tailwind css
 
  -La base de datos estara creada en Mysql
+ -Se utilizaran variables de entorno para resguardar las credenciales
 
  -Entre las funcionalidades que tendra esta aplicacion estarán.
 
 -Registro-
-    *Registro de Usuarios
-    *Crear de cuentas
+    *Generar de registro mediante ORM
+    *Registrar Usuarios
+    *Crear cuentas
+    *Almacenar usuarios en Base de Datos
+    *Prevenir usuarios duplicados
+    *Comprobar normasd de password
+    *Generar tokens de registro y hashear password
     *Iniciar sesión
     *Cerrar sesión
     *Recuperar cuenta
-    *Comprobación
+
     *Validación de usuarios por autenticación a traves de e-mail.
+    *Mostrar pantalla con mensaje de confirmacion
+
 
 
 -Categorización-
