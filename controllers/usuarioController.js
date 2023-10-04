@@ -1,17 +1,19 @@
 import { check, validationResult } from 'express-validator'
 import Usuario from '../models/Usuario.js'
 import { generarId } from '../helpers/tokens.js'
+import { emailRegistro, olvidePasswordMail } from '../helpers/emails.js'
+
 
 const formularioLogin = (req, res) => {
     res.render('auth/login', {
         pagina: 'Iniciar Sesión'
-
     })
 }
 
 const formularioRegistro = (req, res) => {
     res.render('auth/registro', {
-        pagina: 'Crear cuenta'
+        pagina: 'Crear cuenta',
+        csrfToken: req.csrfToken()
     })
 }
 
@@ -33,13 +35,13 @@ const registrar = async (req, res) => {
     // INICIO MOSTRAS ERRORES
         return res.render('auth/registro', {
             pagina: 'Crear cuenta',
+            csrfToken: req.csrfToken(),
             errores: resultado.array(),
             usuario: {
                 nombre: req.body.nombre,
                 email: req.body.email
             }
         })
-
     }
 
     const {nombre, email, password } = req.body
@@ -51,6 +53,7 @@ const registrar = async (req, res) => {
         
         return res.render('auth/registro', {
             pagina: 'Crear cuenta',
+            csrfToken: req.csrfToken(),
             errores: [{msg: 'Ya existe un usuario con ese Email'}],
             usuario: {
                 nombre: req.body.nombre,
@@ -61,7 +64,7 @@ const registrar = async (req, res) => {
     // FIN PREVENIR USUARIOS DUPLICADOS
 
     // INICIO ALMACENAR USUARIO
-    await Usuario.create({
+    const usuario = await Usuario.create({
         nombre,
         email,
         password,
@@ -69,22 +72,117 @@ const registrar = async (req, res) => {
     })
     // FIN ALMACENAR USUARIO
 
-    //MOSTRAR MENSAJE DE CONFIRMACION
+    // ENVIAR EMAIL DE CONFIRMACION
+    emailRegistro({
+        nombre: usuario.nombre,
+        email: usuario.email,
+        token: usuario.token
+    })
+    // FIN EMAIL DE CONFIRMACION
+
+    // MOSTRAR MENSAJE DE CONFIRMACION
     res.render('templates/mensaje', {
         pagina: 'Cuenta creada correctamente',
-        mensaje: 'Hemos enviado un E-Mail de confirmación. Presiona en el enlace.'
+        mensaje: 'Hemos enviado un enlace de confirmacion a tu direccion de correo electronico.'
     })
+    // FIN MOSTRAR MENSAJE DE CONFIRMACION
 }
 
+    // CONFIRMAR CUENTA Y TOKEN
+const confirmar = async (req, res) => {
+
+    const  { token } = req.params;
+
+        // VERIFICAR VALIDEZ DE TOKEN: TOKEN INVALIDO
+    const usuario = await Usuario.findOne({where: {token}})
+
+    if(!usuario) {
+        return res.render('auth/confirmar-cuenta', {
+            pagina: 'Error al confirmar cuenta',
+            mensaje: 'Hubo un error al confirmar tu cuenta. Intenta de nuevo.',
+            error: true
+        })
+    }
+        // VERIFICAR VALIDEZ DE TOKEN: TOKEN VALIDO
+    usuario.token = null;
+    usuario.confirm = true;
+    await usuario.save();
+
+    res.render('auth/confirmar-cuenta', {
+        pagina: 'Cuenta Confirmada',
+        mensaje: 'Tu cuenta se confirmó correctamente.',
+    })
+        console.log(usuario)
+}
+
+    // RECUPERAR CUENTA
 const formularioRecovery = (req, res) => {
     res.render('auth/recovery', {
-        pagina: 'Recuperar Cuenta'
+        pagina: 'Recuperar Cuenta',
+        csrfToken: req.csrfToken(),
     })
 }
 
+const resetPassword = async (req, res) => {
+
+    await check('email').isEmail().withMessage('Ingrese un e-mail valido').run(req)
+    let resultado = validationResult(req)
+
+
+    // PREVENIR REGISTROS VACIOS
+    if(!resultado.isEmpty()) {
+    // INICIO MOSTRAS ERRORES
+        return res.render('auth/recovery', {
+            pagina: 'Recuperar Cuenta',
+            csrfToken: req.csrfToken(),
+            errores: resultado.array()
+        })
+    }
+
+    // BUSCAR USUARIO
+    const {email} = req.body
+
+    const usuario = await Usuario.findOne({where: {email}})
+    if(!usuario) {
+        return res.render('auth/recovery', {
+            pagina: 'Recuperar Cuenta',
+            csrfToken: req.csrfToken(),
+            errores: [{msg: 'El E-mail no está registrado'}]
+        })
+    }
+
+    // Generar token y enviar E-mail
+    usuario.token = generarId();
+    await usuario.save();
+
+    // Enviar email
+    olvidePasswordMail({
+        email: usuario.email,
+        nombre: usuario.nombre,
+        usuario: usuario.token
+    })
+
+    // Mostrar mensaje de confirmacion
+    res.render('templates/mensaje', {
+        pagina: 'Reestablece tu password',
+        mensaje: 'Hemos enviado un email con las instrucciones.'
+    })
+}
+
+const comprobarToken = (req, res, next) => {
+    next();
+}
+
+const nuevoPassword = (req, res) => {
+
+}
 export {
     formularioLogin,
     formularioRegistro,
     registrar,
-    formularioRecovery
+    confirmar,
+    formularioRecovery,
+    resetPassword,
+    comprobarToken,
+    nuevoPassword
 }
