@@ -3,7 +3,7 @@
 
  En este proyecto crearé una aplicación para anunciar bienes raices en la cual se podran consultar, comprar y vender propiedades.
 
- La idea de este curso es entrar en contacto con NODE.js, e incluye MVC y Rest APIs
+ La idea de este curso es entrar en contacto con NODE.js, se desarrolla bajo MVC.
  La parte visual estará creada en Tailwind css
 
  La base de datos estara creada en Mysql
@@ -14,10 +14,9 @@
 *Registro-
     -Generar de registro mediante ORM
     -Registrar Usuarios
-    -Crear cuentas
     -Almacenar usuarios en Base de Datos
     -Prevenir usuarios duplicados
-    -Comprobar normasd de password
+    -Comprobar normas de password
     -Generar tokens de registro y hashear password
     -Iniciar sesión
     -Cerrar sesión
@@ -45,7 +44,7 @@
     -Recepcion de mensajeria.
 
 *Panel de Usuario-
-    -Cuandro de texto de contacto.
+    -Cuadro de texto de contacto.
 
 
 
