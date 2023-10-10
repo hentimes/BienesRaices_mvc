@@ -7,10 +7,65 @@ import { emailRegistro, olvidePasswordMail } from '../helpers/emails.js'
 
 const formularioLogin = (req, res) => {
     res.render('auth/login', {
-        pagina: 'Iniciar Sesión'
+        pagina: 'Iniciar Sesión',
+        csrfToken: req.csrfToken()
     })
 }
 
+const autenticar = async (req, res) => {
+    //Validacion
+    await check('email').isEmail().withMessage('El e-mail es obligatorio').run(req)
+    await check('password').notEmpty().withMessage('El Password es obligatorio').run(req)
+
+
+    let resultado = validationResult(req)
+
+    // PREVENIR REGISTROS VACIOS
+    if(!resultado.isEmpty()) {
+     
+    // MOSTRAR ERRORES
+        return res.render('auth/login', {
+            pagina: 'Iniciar Sesión',
+            csrfToken: req.csrfToken(),
+            errores: resultado.array()
+        })
+    }
+
+    const { email, password } = req.body
+    // COMPROBAR EXISTENCIA DE USUARIO
+
+    const usuario = await Usuario.findOne({ where: { email }})
+    if(!usuario) {
+
+        return res.render('auth/login', {
+            pagina: 'Iniciar Sesión',
+            csrfToken: req.csrfToken(),
+            errores: [{msg: "El usuario no existe"}]
+        })
+    }
+
+    // COMPROBAR VALIDACION DE USUARIO
+    if (!usuario.confirmado) {
+
+        return res.render('auth/login', {
+            pagina: 'Iniciar Sesión',
+            csrfToken: req.csrfToken(),
+            errores: [{msg: "Tu cuenta no ha sido confirmada"}]
+        })
+    }
+
+    // REVISAR EL PASSWORD
+    if(!usuario.verificarPassword(password)) {
+        
+        return res.render('auth/login', {
+            pagina: 'Iniciar Sesión',
+            csrfToken: req.csrfToken(),
+            errores: [{msg: "El password es incorrecto"}]
+        })
+    }
+}   
+
+    
 const formularioRegistro = (req, res) => {
     res.render('auth/registro', {
         pagina: 'Crear cuenta',
@@ -49,7 +104,7 @@ const registrar = async (req, res) => {
     // FIN MOSTRAR ERRORES
 
     // INICIO PREVENIR USUARIOS DUPLICADOS
-    const existeUsuaruio = await Usuario.findOne ({ where : {email : req.body.email}})
+    const existeUsuaruio = await Usuario.findOne ({ where : { email : req.body.email }})
     if(existeUsuaruio) {
         
         return res.render('auth/registro', {
@@ -62,7 +117,7 @@ const registrar = async (req, res) => {
             }
         })
     }
-    // FIN PREVENIR USUARIOS DUPLICADOS
+
 
     // INICIO ALMACENAR USUARIO
     const usuario = await Usuario.create({
@@ -71,7 +126,7 @@ const registrar = async (req, res) => {
         password,
         token: generarId()
     })
-    // FIN ALMACENAR USUARIO
+
 
     // ENVIAR EMAIL DE CONFIRMACION
     emailRegistro({
@@ -79,14 +134,13 @@ const registrar = async (req, res) => {
         email: usuario.email,
         token: usuario.token
     })
-    // FIN EMAIL DE CONFIRMACION
 
     // MOSTRAR MENSAJE DE CONFIRMACION
     res.render('templates/mensaje', {
         pagina: 'Cuenta creada correctamente',
         mensaje: 'Hemos enviado un enlace de confirmacion a tu direccion de correo electronico.'
     })
-    // FIN MOSTRAR MENSAJE DE CONFIRMACION
+
 }
 
     // CONFIRMAR CUENTA Y TOKEN
@@ -95,7 +149,7 @@ const confirmar = async (req, res) => {
     const  { token } = req.params;
 
         // VERIFICAR VALIDEZ DE TOKEN: TOKEN INVALIDO
-    const usuario = await Usuario.findOne({where: {token}})
+    const usuario = await Usuario.findOne({ where: {token}})
 
     if(!usuario) {
         return res.render('auth/confirmar-cuenta', {
@@ -143,7 +197,7 @@ const resetPassword = async (req, res) => {
     // BUSCAR USUARIO
     const {email} = req.body
 
-    const usuario = await Usuario.findOne({where: {email}})
+    const usuario = await Usuario.findOne({ where: {email}})
     if(!usuario) {
         return res.render('auth/recovery', {
             pagina: 'Recuperar Cuenta',
@@ -175,7 +229,7 @@ const comprobarToken = async (req, res) => {
     const { token } = req.params;
 
 
-    const usuario = await Usuario.findOne({where: {token}})
+    const usuario = await Usuario.findOne({ where: {token}})
 
     if(!usuario) {
         return res.render('auth/confirmar-cuenta', {
@@ -213,7 +267,7 @@ const nuevoPassword = async (req, res) => {
     const { password } = req.body;
 
     // Identificar usuario
-    const usuario = await Usuario.findOne({where: {token}})
+    const usuario = await Usuario.findOne({ where: {token}})
 
     // Hashear password
     const salt = await bcrypt.genSalt(10)
@@ -229,6 +283,7 @@ const nuevoPassword = async (req, res) => {
 
 export {
     formularioLogin,
+    autenticar,
     formularioRegistro,
     registrar,
     confirmar,

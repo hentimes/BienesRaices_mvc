@@ -1,4 +1,4 @@
-# BienesRaices_mvc
+# Bienes Raices
  Proyecto Node.js
 
  En este proyecto crearé una aplicación para anunciar bienes raices en la cual se podran consultar, comprar y vender propiedades.
