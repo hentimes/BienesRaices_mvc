@@ -1,7 +1,8 @@
 import { check, validationResult } from 'express-validator'
 import bcrypt from 'bcrypt'
+
 import Usuario from '../models/Usuario.js'
-import { generarId } from '../helpers/tokens.js'
+import { generarJWT, generarId } from '../helpers/tokens.js'
 import { emailRegistro, olvidePasswordMail } from '../helpers/emails.js'
 
 
@@ -13,16 +14,14 @@ const formularioLogin = (req, res) => {
 }
 
 const autenticar = async (req, res) => {
-    //Validacion
+    // VALIDACION
     await check('email').isEmail().withMessage('El e-mail es obligatorio').run(req)
     await check('password').notEmpty().withMessage('El Password es obligatorio').run(req)
-
 
     let resultado = validationResult(req)
 
     // PREVENIR REGISTROS VACIOS
     if(!resultado.isEmpty()) {
-     
     // MOSTRAR ERRORES
         return res.render('auth/login', {
             pagina: 'Iniciar Sesión',
@@ -32,8 +31,8 @@ const autenticar = async (req, res) => {
     }
 
     const { email, password } = req.body
-    // COMPROBAR EXISTENCIA DE USUARIO
 
+    // COMPROBAR EXISTENCIA DE USUARIO
     const usuario = await Usuario.findOne({ where: { email }})
     if(!usuario) {
 
@@ -45,7 +44,7 @@ const autenticar = async (req, res) => {
     }
 
     // COMPROBAR VALIDACION DE USUARIO
-    if (!usuario.confirmado) {
+    if (!usuario.confirm) {
 
         return res.render('auth/login', {
             pagina: 'Iniciar Sesión',
@@ -63,7 +62,21 @@ const autenticar = async (req, res) => {
             errores: [{msg: "El password es incorrecto"}]
         })
     }
-}   
+
+    // Autenticar al Usuario
+    const token = generarJWT({ id: usuario.id, nombre: usuario.nombre })
+
+    console.log(token)
+
+    // Almacenar en un cookies
+
+    return res.cookie('_token', token, {
+        httpOnly: true,
+        //secure: true  Solo permite cookies en conexiones seguras. Con SSL
+        //sameSite: true
+
+    }).redirect('/mis-propiedades')
+}
 
     
 const formularioRegistro = (req, res) => {
