@@ -2,8 +2,9 @@
 (function() {
 
     //Coordenadas
-    const lat = -33.4165075;
-    const lng = -70.606795;
+    //Logical Or
+    const lat = document.querySelector('#lat').value || -33.4165075;
+    const lng = document.querySelector('#lng').value || -70.606795;
     const mapa = L.map('mapa').setView([lat, lng ], 15);
     let marker;
 
@@ -38,7 +39,7 @@
             document.querySelector('.calle').textContent = resultado?.address?.Address ?? '';
             document.querySelector('#calle').value = resultado?.address?.Address ?? '';
             document.querySelector('#lat').value = resultado?.latlng?.lat ?? '';
-            document.querySelector('#lng').value = resultado?.lng?.lng ?? '';
+            document.querySelector('#lng').value = resultado?.latlng?.lng ?? '';
         })
     })
 

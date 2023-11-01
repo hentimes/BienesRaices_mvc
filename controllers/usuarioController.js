@@ -44,7 +44,7 @@ const autenticar = async (req, res) => {
     }
 
     // COMPROBAR VALIDACION DE USUARIO
-    if (!usuario.confirm) {
+    if (!usuario.confirmado) {
 
         return res.render('auth/login', {
             pagina: 'Iniciar Sesión',
