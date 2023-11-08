@@ -173,7 +173,7 @@ const confirmar = async (req, res) => {
     }
         // VERIFICAR VALIDEZ DE TOKEN: TOKEN VALIDO
     usuario.token = null;
-    usuario.confirm = true;
+    usuario.confirmado = true;
     await usuario.save();
 
     res.render('auth/confirmar-cuenta', {
