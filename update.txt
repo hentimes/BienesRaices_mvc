@@ -1,0 +1,33 @@
+Mostrar mapa, 
+Seleccionar ubicacion del mapa( Lat, Lng )
+añadir pin al mapa
+permitir arrastrar el pin por el mapa
+Permitir que el mapa se mueva al soltar el pin
+Permitir que el mapa se mueva al mover el pin
+permitir que el se centre al soltar el pin en el mapa
+Mostrar un popup con la informacion de la ubicacion al posicionar mapa
+
+permitir mostrar en pantalla la ubicacion del pin
+almacenar en la base de datos la lat y lng
+
+crear los seeds de categorias y precios
+Importar y eliminar datos de la db
+Importar Categorias y precios desde la db a la vista de Crear
+
+crear formulario con crear propiedades
+proteger la rura a crear propiedades (Verificar si hay token y protegerlo)
+proteger y autorizar token
+proteger rutas
+
+Añadir imagenes a la propiedad:
+crear vista de agregar imagen
+instalar dependencia de npm dropzone
+configurar el agregar imagen con dropzone
+crear el area de dropzone y darle estilo.
+validar el link del area agregar propiedad
+
+     Validar que la propiedad exista
+     Validar que la propiedad no esté publicada
+     Validar que la propiedad pertece al usuario logueado
+	 
+leer y enviar el csrftoken al cargar imagenes

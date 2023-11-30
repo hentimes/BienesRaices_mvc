@@ -8,3 +8,16 @@ block contenido
         h2.text-center.text-2xl.font-extrabold= pagina
 
         a(href="/propiedades/crear" class="rounded-md py-2 px-10 bg-pink-400 hover:bg-pink-500 text-sm font-bold text-white text-center my-5 inline-block w-full md:w-auto") Publicar Propiedad
+
+        if propiedades.lenght
+
+            div(class="bg-white shadow rounded-lg")
+                ul(class"divide-y divide-gray-200")
+                    each propiedad in propiedades
+                        li
+                            div(class="p-6 w-full flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-8 gap-4")
+                                div(class="sm:w-1/4 md:w-1/6")
+                                div(class="sm:w-2/4 md:w-3/6 lg:w-4/6")
+                                div(class="sm:w-1/4 md:w-2/6 lg:w-1/6")
+        else 
+            p.text-center No hay Propiedades 
